@@ -21,7 +21,8 @@ class Mytar:
     # python tar.py target.tar.[ext] path 
     def pack(self, targetall, path):
         name,ext = os.path.splitext(targetall) 
-        if ".xz" == ext:
+        ext = ext.strip('.')
+        if "xz" == ext:
             self.tar = tarfile.TarFile.open(name, "w")
         else:
             self.tar = tarfile.TarFile.open(targetall, "w:" + ext)
@@ -29,7 +30,7 @@ class Mytar:
             self.tar.add(i, filter=self.translateToGB18030)
         self.tar.close()
 
-        if '.xz' == ext:
+        if 'xz' == ext:
             print('waiting for xz utils')
             os.system('xz '+name)
             print('compress completed')
@@ -38,15 +39,16 @@ class Mytar:
 
     def unpack(self, targetall, path):
         name,ext = os.path.splitext(targetall) 
-        if ".xz" == ext:
+        ext = ext.strip('.')
+        if "xz" == ext:
             os.system('xz -d -k ' + targetall)
             self.tar = tarfile.TarFile.open(name, "r")
         else:
-            self.tar = tarfile.TarFile.open(targetall, "r:" + targetall.split('.')[-1])
+            self.tar = tarfile.TarFile.open(targetall, "r:" + ext)
         
         self.tar.extractall(path=path, members=self.translateToUtf8(self.tar))
         self.tar.close() 
-        if '.xz' == ext:
+        if 'xz' == ext:
             os.system('rm -f ' + name)
 
     def translateToGB18030(self, tarinfo):
